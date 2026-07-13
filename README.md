@@ -20,7 +20,7 @@ Page Object Model.
     config/config.py            Đọc cấu hình từ .env
     pages/base_page.py          Lớp cơ sở POM (navigate, fill, click...)
     pages/registration_page.py  Logic đăng ký + selector + giải captcha + OTP
-    utils/data_loader.py        Đọc danh sách account từ data/accounts.json
+    utils/data_loader.py        Đọc account từ JSON/CSV/Excel/Word (tự map cột)
     utils/api_client.py         Client gọi API giải Captcha và nhận OTP
     utils/helpers.py            Khởi tạo / đóng browser
     data/accounts.json          Danh sách tài khoản cần đăng ký
@@ -38,8 +38,25 @@ Ghi chú: nếu lệnh `python` không chạy trên máy, dùng `py` thay thế.
 
 # HƯỚNG DẪN 1: Chạy trên WEB THẬT
 
-## Bước 1 - Chỉnh dữ liệu tài khoản
-Sửa `data/accounts.json`, mỗi tài khoản một object:
+## Bước 1 - Chuẩn bị dữ liệu tài khoản
+
+Bot đọc được nhiều định dạng, tự nhận diện theo đuôi file:
+
+    .json    Mảng các object
+    .csv     Dòng đầu là tiêu đề cột
+    .xlsx    Excel, dòng đầu là tiêu đề cột
+    .docx    Word, dạng BẢNG (hàng đầu là tiêu đề) hoặc dạng "Nhãn: giá trị"
+
+Trường bắt buộc: username, email, password. Tùy chọn: full_name.
+
+Bot tự map tên cột/tiêu đề (kể cả tiếng Việt có dấu) về trường chuẩn:
+
+    username   <- "Tên đăng nhập", "Tài khoản", "user", "login"
+    email      <- "Email", "Thư điện tử", "mail"
+    password   <- "Mật khẩu", "pass", "pwd"
+    full_name  <- "Họ và tên", "Họ tên", "Tên", "name"
+
+Ví dụ file JSON (data/accounts.json):
 
     [
       {
@@ -50,7 +67,16 @@ Sửa `data/accounts.json`, mỗi tài khoản một object:
       }
     ]
 
-Bắt buộc: username, email, password. Tùy chọn: full_name.
+Ví dụ file Excel/CSV:
+
+    Tên đăng nhập | Email            | Mật khẩu    | Họ và tên
+    taikhoan1     | email1@gmail.com | MatKhau@123 | Nguyen Van A
+
+Chọn file dữ liệu khi chạy:
+
+    py main.py <link> duong/dan/file.xlsx
+
+Hoặc để trống -> mặc định dùng data/accounts.json.
 
 ## Bước 2 - Cấu hình API captcha / OTP trong file .env
 

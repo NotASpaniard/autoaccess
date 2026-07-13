@@ -9,7 +9,7 @@ from utils.api_client import OTPReceiver, CaptchaSolver
 def get_website_url() -> str:
     """Lay link trang web can dang ky.
 
-    Uu tien:  1) tham so dong lenh:  python main.py <link>
+    Uu tien:  1) tham so dong lenh:  python main.py <link> [file_du_lieu]
               2) nhap tay khi duoc hoi
               3) mac dinh tu .env (Config.BASE_URL)
     """
@@ -23,18 +23,39 @@ def get_website_url() -> str:
     return entered or Config.BASE_URL
 
 
+def get_data_file() -> str:
+    """Lay duong dan file du lieu tai khoan (JSON/CSV/Excel/Word).
+
+    Uu tien:  1) tham so dong lenh thu 2:  python main.py <link> <file>
+              2) nhap tay khi duoc hoi
+              3) mac dinh data/accounts.json (tra ve None)
+    """
+    if len(sys.argv) > 2 and sys.argv[2].strip():
+        return sys.argv[2].strip()
+
+    try:
+        entered = input("Nhap duong dan file du lieu (Enter = data/accounts.json): ").strip()
+    except EOFError:
+        entered = ""
+    # Bo dau nhay neu keo tha file vao terminal
+    return entered.strip('"').strip("'") or None
+
+
 def main():
     website = get_website_url()
     Config.BASE_URL = website          # dat lai link web cho toan bo bot
     print(f"[INFO] Trang web muc tieu: {website}")
 
+    data_file = get_data_file()
+
     playwright, browser, context, page = create_browser()
     succeeded = []   # danh sach username thanh cong
     failed = []      # danh sach (username, ly_do) that bai
     try:
-        accounts = load_accounts()
+        accounts = load_accounts(data_file)
         total = len(accounts)
-        print(f"[INFO] Da nap {total} tai khoan tu data/accounts.json")
+        nguon = data_file or "data/accounts.json"
+        print(f"[INFO] Da nap {total} tai khoan tu {nguon}")
 
         reg_page = RegistrationPage(page)
         otp_receiver = OTPReceiver()

@@ -3,3 +3,6 @@ pytest
 pytest-playwright
 requests
 python-dotenv
+flask
+openpyxl
+python-docx
