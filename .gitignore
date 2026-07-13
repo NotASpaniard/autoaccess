@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Playwright / runtime tam
+temp_captcha.png
+*.png.tmp
+
+# IDE
+.vscode/
+.idea/
+
+# LUU Y: .env hien chua co secret nen dang duoc commit de mock chay ngay.
+# Khi them API key THAT vao .env -> bo comment dong duoi day va chay:
+#     git rm --cached .env
+# .env
